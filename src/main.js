@@ -1,13 +1,12 @@
 import Vue from 'vue'
 import App from './App'
-import VConsole from 'vconsole'
-
+// import VConsole from 'vconsole'
 import uView from 'uview-ui'
-Vue.use(uView)
 
+Vue.use(uView)
 Vue.config.productionTip = false
 
-new VConsole()
+// Vue.prototype.$vconsole = new VConsole()
 
 App.mpType = 'app'
 

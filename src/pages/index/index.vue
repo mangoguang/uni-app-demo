@@ -3,7 +3,8 @@
 		<u-action-sheet :list="list" v-model="show"></u-action-sheet>
 		<view>
 			<text class="title">{{title}}</text>
-			<u-button @click="vconsoleShow" type="primary">show Vconsole</u-button>
+			<u-button @click="getPlays" type="primary">get plays</u-button>
+			<u-button @click="smsVerify" type="primary">短信验证</u-button>
 
 			<u-tabbar v-model="current" :list="tabbarList" :mid-button="true"></u-tabbar>
 		</view>
@@ -11,6 +12,11 @@
 </template>
 
 <script>
+import { apiLogin } from '@/apis/common'
+import MD5 from 'crypto-js/md5'
+import { localStorageKeys } from '@/common/constants'
+import { apiGetMahjongList } from '@/apis/play'
+
 export default {
   data() {
     return {
@@ -66,6 +72,9 @@ export default {
       start: 0
     }
   },
+  mounted() {
+    this.login()
+  },
   onLoad() {
 
   },
@@ -73,27 +82,45 @@ export default {
     showSelect() {
       this.show = true
     },
-    vconsoleShow() {
-      if (this.count === 0) {
-        this.start = Date.now()
-      }
-      console.log(123)
-      this.count += 1
-      if (this.count > 5) {
-        const time = Date.now() - this.start
-        if (time < 8800) {
-          // 2s内点击6次
-          this.count = -1000
-          const vconsole = document.querySelector('#__vconsole')
-          if (vconsole) {
-            vconsole.style.display = 'block'
-          }
-        } else {
-          // 超过2s重新计算
-          this.count = 0
-          this.start = 0
-        }
-      }
+    async login() {
+      const loginData = await apiLogin('guang', { password: MD5('427815').toString(), uuid: '123456' })
+      uni.setStorageSync(localStorageKeys.TOKEN, `Bearer ${loginData.token}`)
+    },
+    async getPlays() {
+      const res = await apiGetMahjongList({ limit1: 100, page1: 1 })
+      console.log('牌局：', res)
+    },
+    async smsVerify() {
+      // const uniID = require('uni-id')
+      // exports.main = async function(event, context) {
+      //   const {
+      //     mobile
+      //   } = event
+      //   // 生成验证码可以按自己的需求来，这里以生成6位数字为例
+      //   const randomStr = '00000' + Math.floor(Math.random() * 1000000)
+      //   const code = randomStr.substring(randomStr.length - 6)
+      //   const res = await uniID.sendSmsCode({
+      //     mobile,
+      //     code,
+      //     type: 'login'
+      //   })
+      //   return res
+      // }
+
+      // const res = await uniCloud.sendSms({
+      //   appid: '__UNI__6D1BF02',
+      //   smsKey: '1d0ee99dfc0e9db5368c4c29f11ea7d0',
+      //   smsSecret: '8b95ce43f72212c916cff3f9f6748649',
+      //   phone: '13392834870',
+      //   templateId: 'uniID_code',
+      //   data: {
+      //     name: 'DCloud',
+      //     code: '123468',
+      //     action: '注册',
+      //     expMinute: '3'
+      //   }
+      // })
+      // console.log('短信验证调用成功。', res)
     }
   }
 }
