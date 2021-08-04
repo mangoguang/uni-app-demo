@@ -4,20 +4,23 @@ const SENTRY_DSN = 'https://ae820a14a8994bb79fcf519a5ea3f7b4@o867798.ingest.sent
 // 代理
 exports.configMap = {
   development: {
-    baseURL: 'https://www.mangoguang.cn/api',
-    // baseURL: 'http://localhost:7001/api',
+    // baseURL: 'https://www.mangoguang.cn/api',
+    baseURL: 'http://localhost:7001/api',
+    imgPath: 'http://localhost:7001',
     sentryDSN: '',
     siteID: '',
     appID: '__UNI__6D1BF02'
   },
   sit: {
     baseURL: 'https://customer-sit-api.fcb.com.cn',
+    imgPath: 'http://mangoguang.cn:8888',
     sentryDSN: SENTRY_DSN,
     siteID: SITE_ID,
     appID: '__UNI__6D1BF02'
   },
   production: {
     baseURL: 'https://www.mangoguang.cn/api',
+    imgPath: 'http://mangoguang.cn:8888',
     sentryDSN: SENTRY_DSN,
     siteID: SITE_ID,
     appID: '__UNI__6D1BF02'

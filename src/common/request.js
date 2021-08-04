@@ -3,7 +3,7 @@ import { localStorageKeys } from '@/common/constants'
 
 const { configMap } = require('../../resource.config')
 const env = process.env.NODE_ENV
-const { baseURL } = configMap[env]
+const { baseURL, imgPath } = configMap[env]
 const http = new Request()
 
 http.setConfig((config) => { /* config 为默认全局配置*/
@@ -20,8 +20,8 @@ http.interceptors.request.use((config) => { // 可使用async await 做异步操
     // 设置请求头headers
     config.header = {
       ...config.header,
-      'Content-Type': 'application/json; charset=utf-8', // 演示用
-      Authorization: token // 演示用
+      'Content-Type': 'application/json; charset=utf-8',
+      Authorization: token
     }
   }
   return config
@@ -61,3 +61,4 @@ http.interceptors.response.use((response) => { /* 对响应成功做点什么 �
 })
 
 export default http
+export { baseURL, imgPath }
