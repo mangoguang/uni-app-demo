@@ -13,18 +13,18 @@
 			"selectedIconPath": "static/images/home/home_icon_select_v2.png",
 			"text": "首页"
     }, {
-			"pagePath": "pages/order/add",
+			"pagePath": "pages/play/index",
 			"iconPath": "static/images/home/min_button.png",
 			"selectedIconPath": "static/images/home/min_button_select.png",
-			"text": "新增"
+			"text": "牌局"
     }, {
-			"pagePath": "pages/play/index",
+			"pagePath": "pages/my/index",
 			"iconPath": "static/images/home/my_icon_v2.png",
 			"selectedIconPath": "static/images/home/my_icon_select_v2.png",
 			"text": "我的"
     }]
 	},
-	"pages": [ // pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -53,13 +53,26 @@
 		{
 			"path": "pages/play/index",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
 			"path": "pages/play/add",
 			"style": {
 				"navigationBarTitleText": "新增牌局"
+			}
+		},
+		{
+			"path": "pages/dictionary/list",
+			"style": {
+				"navigationBarTitleText": "数据字典"
+			}
+		},
+		{
+			"path": "pages/my/index",
+			"style": {
+				"navigationBarTitleText": "我的"
 			}
 		}
 	],

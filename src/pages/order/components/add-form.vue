@@ -15,11 +15,11 @@
         <!-- <u-icon slot="right" @click="edit" :name="disabled ? 'lock-fill' : 'lock-opened-fill'" color="#19be6b" :size="pageType === 'detail' ? '50rpx' : '0'"></u-icon> -->
       </u-form-item>
       <!-- <u-form-item v-if="orderType" label="分类" prop="incomeType"><u-input v-model="form.incomeType" @click="() => select('incomeType')" disabled type="select" /></u-form-item> -->
-      <u-form-item label="分类" prop="classifyType"><u-input v-model="form.classifyType" @click="() => select('classifyType')" disabled type="select" /></u-form-item>
-      <u-form-item label="账户" prop="accountType"><u-input v-model="form.accountType" @click="() => select('accountType')" disabled type="select" /></u-form-item>
+      <u-form-item label="分类" prop="classifyType"><u-input v-model="form.classifyType" @click="() => select('classifyType', dictType.PAY_TYPE)" disabled type="select" /></u-form-item>
+      <u-form-item label="账户" prop="accountType"><u-input v-model="form.accountType" @click="() => select('accountType', dictType.ACCOUNT_TYPE)" disabled type="select" /></u-form-item>
       <u-form-item label="时间"><u-input v-model="form.date" @click="selectTime" disabled /></u-form-item>
-      <u-form-item label="成员"><u-input v-model="form.memberType" @click="() => select('memberType')" disabled type="select" /></u-form-item>
-      <u-form-item label="项目"><u-input v-model="form.projectType" @click="() => select('projectType')" disabled type="select" /></u-form-item>
+      <u-form-item label="成员"><u-input v-model="form.memberType" @click="() => select('memberType', dictType.MEMBER_TYPE)" disabled type="select" /></u-form-item>
+      <u-form-item label="项目"><u-input v-model="form.projectType" @click="() => select('projectType', dictType.PROJECT_TYPE)" disabled type="select" /></u-form-item>
       <u-form-item label="备注:" label-position="top"><u-input v-model="form.remark" type="textarea" :disabled="isCanEdit()" /></u-form-item>
       <u-form-item>
         <u-upload
@@ -40,6 +40,8 @@
       <u-button v-else :disabled="isCanEdit()" @click="submit" :type="orderType ? 'primary' : 'success'">保存</u-button>
     </u-form>
     <!-- 支出表单 end -->
+
+    <view @click="addDict" v-if="isSelectShow" class="add-btn-box"><text>新增分类</text></view>
 
     <u-select v-model="isSelectShow" :default-value="selectValue" mode="mutil-column-auto" :list="selectList" @confirm="selectConfirm"></u-select>
     <u-picker mode="time" @confirm="timeConfirm" v-model="isTimeShow" :params="params"></u-picker>
@@ -73,6 +75,7 @@ export default {
   },
   data() {
     return {
+      dictType,
       // 表单变量
       form: {
         money: '',
@@ -97,12 +100,6 @@ export default {
             message: '请选择支付方式'
           }
         ],
-        // incomeType: [
-        //   {
-        //     required: this.orderType === 1,
-        //     message: '请选择支付方式'
-        //   }
-        // ],
         accountType: [
           {
             required: true,
@@ -125,6 +122,7 @@ export default {
       memberTypeList: [], // 成员数据字典
       projectTypeList: [], // 项目据字典
       currentSelect: '',
+      currentDictType: '',
       isTimeShow: false,
       params: {
         year: true,
@@ -157,7 +155,7 @@ export default {
       if (this.isCanEdit()) return // 详情页使用时，初始状态不可编辑
       this.isTimeShow = true
     },
-    select(type) {
+    select(type, dictType) {
       if (this.isCanEdit()) return // 详情页使用时，初始状态不可编辑
       if (type === 'accountType') {
         this.selectValue = [3, 0]
@@ -165,6 +163,7 @@ export default {
         this.selectValue = [0, 0]
       }
       this.currentSelect = type
+      this.currentDictType = dictType
       this.selectList = this[`${type}List`]
       this.isSelectShow = true
     },
@@ -267,6 +266,12 @@ export default {
     imgUploadSuccess(res, index, lists, name) {
       const { url } = res.data
       lists[index].imgUrl = url
+    },
+    addDict() {
+      this.isSelectShow = false
+      uni.navigateTo({
+        url: `/pages/dictionary/list?type=${this.currentSelect}&dictType=${this.currentDictType}`
+      })
     }
   }
 }
@@ -276,4 +281,21 @@ export default {
 .form-box {
   padding: 20rpx 32rpx;
 }
+.add-btn-box {
+  display: flex;
+  justify-content: center;
+  width: 50vw;
+  position: fixed;
+  bottom: 20rpx;
+  right: 0rpx;
+  z-index: 10099;
+  text {
+    font-size: 32rpx;
+    width: 100%;
+    line-height: 68rpx;
+    text-align: center;
+    color: $uni-color-primary;
+  }
+}
+
 </style>

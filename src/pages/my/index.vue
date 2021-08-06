@@ -21,7 +21,6 @@
             class="cell-item"
           >
           </u-cell-item>
-          <player-item :detail="item" />
         </u-collapse-item>
       </u-swipe-action>
     </u-collapse>
@@ -33,11 +32,9 @@
 
 <script>
 import { apiGetMahjongList, apiDelMahjong } from '@/apis/play'
-import { playerItem } from './components/player-item'
 import { sendDateTime } from '@/common/utils'
 
 export default {
-  components: { playerItem },
   data() {
     return {
       sendDateTime,

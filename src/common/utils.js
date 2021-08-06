@@ -169,7 +169,6 @@ export const _filterDictList = (list) => {
         label: childItem.dictName
       }
     })
-    console.log('=======', children)
 
     const obj = {
       value: item.dictCode,

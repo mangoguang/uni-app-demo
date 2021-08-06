@@ -15,12 +15,12 @@
           <text>guang</text>
         </view>
         <view class="pay-info">
-          <text class="first">7月●支出：{{ userInfo.monthPay }}</text>
+          <text class="first">7月●支出：{{ payInfo.monthPay }}</text>
           <view>
-            <text>本月可用：{{ userInfo.monthBalance }}</text>
+            <text>本月可用：{{ payInfo.monthBalance }}</text>
             <u-icon @click="editMonthQuota" color="#19be6b" name="edit-pen"></u-icon>
           </view>
-          <text>本月收入：{{ userInfo.monthIncome }}</text>
+          <text>本月收入：{{ payInfo.monthIncome }}</text>
         </view>
       </view>
 
@@ -39,6 +39,19 @@
         </u-cell-item>
       </u-cell-group>
 		</view>
+
+    <u-modal
+      v-model="isEditShow"
+      :show-cancel-button="true"
+      title="额度设置"
+      @confirm="setMonthQuota"
+    >
+			<view class="slot-content">
+				<u-field v-model="monthQuota" label="金额" placeholder="请输入每月可用额度"></u-field>
+			</view>
+		</u-modal>
+
+		<u-icon @click="toAddPage" :custom-style="plusIconStyle" name="plus-circle-fill" color="#2979ff" size="100"></u-icon>
 	</view>
 </template>
 
@@ -47,7 +60,7 @@
 // import MD5 from 'crypto-js/md5'
 import { uuid, sendDateTime } from '@/common/utils'
 import { localStorageKeys, weappInfo, timeInterval } from '@/common/constants'
-import { apiPayInfo, apiGetUserInfoByCode } from '@/apis/users'
+import { apiPayInfo, apiGetUserInfoByCode, apiSetMonthQuota } from '@/apis/users'
 const date = new Date()
 const day = date.getDay()
 
@@ -60,6 +73,7 @@ export default {
         monthIncome: 0,
         monthBalance: 0
       },
+      monthQuota: 0,
       list: [{
         title: '今天',
         date: sendDateTime(date, 'MM月dd日'),
@@ -84,17 +98,21 @@ export default {
         pay: '',
         income: '',
         timeInterval: timeInterval.YEAR
-      }]
+      }],
+      isEditShow: false,
+      payInfo: {},
+      plusIconStyle: {
+        position: 'fixed',
+        bottom: '50rpx',
+        right: '32rpx'
+      }
     }
   },
   mounted() {
     this.login()
   },
-  onLoad() {
-
-  },
   onShow() {
-
+    this.getPayInfo()
   },
   methods: {
     async login() {
@@ -122,21 +140,19 @@ export default {
         })
       })
       promise.then(res => {
-        console.log('登陆：：：', res)
-        // this.jsCode = res.res && res.res.code
         this.userInfo = res.userInfo
         this.getPayInfo()
-        // this.setData()
       }).catch(() => { this.isLoadingShow = false })
     },
     // 获取用户收支情况
     async getPayInfo() {
       const res = await apiPayInfo()
       const list = this.list
-      const userInfo = this.userInfo
-      userInfo.monthPay = Number(res.monthPay.toFixed(2))
-      userInfo.monthIncome = Number(res.monthIncome.toFixed(2))
-      userInfo.monthBalance = Number((res.monthQuota - res.monthPay).toFixed(2))
+      const payInfo = this.payInfo
+      payInfo.monthPay = Number(res.monthPay.toFixed(2))
+      payInfo.monthIncome = Number(res.monthIncome.toFixed(2))
+      payInfo.monthBalance = Number((res.monthQuota - res.monthPay).toFixed(2))
+      this.monthQuota = res.monthQuota
       list[0].pay = res.dayPay
       list[0].income = res.dayIncome
       list[1].pay = res.weekPay
@@ -152,11 +168,24 @@ export default {
     },
     // 修改用户月度可用额度
     editMonthQuota() {
+      this.isEditShow = true
       console.log('修改用户月度可用额度')
+    },
+    async setMonthQuota() {
+      await apiSetMonthQuota({ monthQuota: this.monthQuota })
+      uni.showToast({
+        title: '设置成功!',
+        success: () => this.getPayInfo()
+      })
     },
     // 跳转收支记录页面
     toListPage(timeInterval) {
       wx.navigateTo({ url: `/pages/order/list?timeInterval=${timeInterval}` })
+    },
+    toAddPage() {
+      uni.navigateTo({
+        url: '/pages/order/add'
+      })
     }
   }
 }

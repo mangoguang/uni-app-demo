@@ -1,31 +1,38 @@
 <template>
 	<view class="content">
-    <u-collapse :head-style="headStyle" :accordion="false">
-      <u-collapse-item
-        v-for="(item, fatherIndex) in orderList"
-        :key="fatherIndex"
-        :open="true"
-        :title="`${item.date} 收：${item.income} 支：${item.pay} 余：${item.surplus}）`"
-      >
-        <u-swipe-action
-          v-for="(data, index) in item.list"
-          :key="data.id"
-          :show="data.show"
-          :index="index"
-          @open="() => open(data.id)"
-          @click="() => delOrder(fatherIndex, index)"
-          :options="options"
+    <scroll-view
+      :scroll-top="scrollTop"
+      scroll-y="true"
+      class="scroll-Y"
+      @scrolltolower="lower"
+    >
+      <u-collapse :head-style="headStyle" :accordion="false">
+        <u-collapse-item
+          v-for="(item, fatherIndex) in orderList"
+          :key="fatherIndex"
+          :open="true"
+          :title="`${item.date} 收：${item.income} 支：${item.pay} 余：${item.surplus}）`"
         >
-          <u-cell-item
-            :arrow="false"
-            :title="data.levelTwoName"
-            :label="`${data.createTime.slice(-8, -3)} ${data.accountName} ${data.memberName}`"
-            :value="data.money"
-            @click="() => toDetailPage(data.id)"
-          />
-        </u-swipe-action>
-      </u-collapse-item>
-    </u-collapse>
+          <u-swipe-action
+            v-for="(data, index) in item.list"
+            :key="data.id"
+            :show="data.show"
+            :index="index"
+            @open="() => open(data.id)"
+            @click="() => delOrder(fatherIndex, index)"
+            :options="options"
+          >
+            <u-cell-item
+              :arrow="false"
+              :title="data.levelTwoName"
+              :label="`${data.createTime.slice(-8, -3)} ${data.accountName} ${data.memberName}`"
+              :value="data.money"
+              @click="() => toDetailPage(data.id)"
+            />
+          </u-swipe-action>
+        </u-collapse-item>
+      </u-collapse>
+    </scroll-view>
 
     <u-modal v-model="isDelShow" @confirm="delOrderConfirm" :content="content"></u-modal>
 	</view>
@@ -59,7 +66,9 @@ export default {
       ],
       isDelShow: false,
       content: '确定删除吗？',
-      current: []
+      current: [],
+      scrollTop: 0,
+      canLoadMore: true
     }
   },
   onLoad(option) {
@@ -75,7 +84,8 @@ export default {
         limit: this.pageObj.limit,
         page: ++this.pageObj.page
       })
-      this.orderList = res
+      this.orderList = [...this.orderList, ...res]
+      this.canLoadMore = res.length >= this.pageObj.limit
     },
     delOrder(fatherIndex, index) {
       this.isDelShow = true
@@ -118,6 +128,10 @@ export default {
     toDetailPage(id) {
       wx.navigateTo({ url: `/pages/order/detail?id=${id}` })
     },
+    // 加载数据
+    lower() {
+      if (this.canLoadMore) this.getOrderList()
+    },
     /**
      * 获取时间间隔
      * @param {string} type - 时间间隔类型
@@ -152,5 +166,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+// 解决u-swipe-action和u-cell-item组件样式冲突问题
+/deep/ .u-collapse-body{
+  height: auto!important;
+}
+.scroll-Y {
+  height: 100vh;
+}
 </style>
